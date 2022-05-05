@@ -2,11 +2,13 @@ import meduza
 import re
 
 
-def getMeduzaPubsByKeywords(keywords, maxSize=25):
+def getMeduzaPubsByKeywords(keywords, maxSize=5):
     meduzaUrlPubMap = {}
     for keyword in keywords:
         pubs = meduza.search(keyword)
         for pub in pubs:
+            if pub == {}:
+                continue
             meduzaUrlPubMap.update({pub["url"]: pub})
             if len(meduzaUrlPubMap) >= maxSize:
                 return list(meduzaUrlPubMap.values())
@@ -55,12 +57,15 @@ def getPubContent(pub):
     if "head" in body:
         for item in body["head"]:
             if item["type"] == "rich_title":
-                content += item["data"]["first"] + "\n"
-                content += item["data"]["second"] + "\n"
+                content += item["data"]["first"] + "\n" if "first" in item["data"] else ""
+                content += item["data"]["second"] + "\n" if "second" in item["data"] else ""
             if item["type"] == "simple_title":
                 content += item["data"]["first"] + "\n"
     if "blocks" in body:
         content += parseBlocks(body["blocks"])
+    if "slides" in body:
+        for slide in body["slides"]:
+            content += parseBlocks(slide["blocks"])
     return content
 
 
@@ -71,7 +76,7 @@ def getMeduzaMentionsByKeywords(keywords):
         content = getPubContent(pub)
         content = re.sub("<.*?>", "", content)
         mentions.append(dict({
-            "url": pub["url"],
+            "url": "meduza.io/" + pub["url"],
             "title": pub["title"],
             "timestamp": pub["datetime"],
             "content": content,

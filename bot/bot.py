@@ -2,6 +2,7 @@
 Telegram-bot analizes mentions of companies and brands in media.
 """
 
+from decouple import config
 import asyncio
 import logging
 import logic
@@ -91,7 +92,8 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     loop.run_until_complete(async_main())
 
-    application = ApplicationBuilder().token(token='TOKEN').build()
+    TOKEN = config('TELEGRAM_BOT_TOKEN')
+    application = ApplicationBuilder().token(token=TOKEN).build()
 
     application.add_handler(CommandHandler(["start", "help"], start))
     application.add_handler(CommandHandler("subscribe", subscribe))

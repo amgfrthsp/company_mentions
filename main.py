@@ -1,5 +1,5 @@
 import sys
-import mentions
+import get_mentions_task
 
 
 def main() -> int:

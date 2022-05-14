@@ -2,20 +2,23 @@ import meduza
 import re
 
 
-def getMeduzaPubsByKeywords(keywords, maxSize=5):
-    meduzaUrlPubMap = {}
-    for keyword in keywords:
-        pubs = meduza.search(keyword)
+def get_meduza_pubs_for_companies(companies, maxSize=5):
+    meduza_url_pub_map = {}
+    for company_id_name in companies:
+        company_id = company_id_name[0]
+        company_name = company_id_name[1]
+        pubs = meduza.search(company_name)
         for pub in pubs:
             if pub == {}:
                 continue
-            meduzaUrlPubMap.update({pub["url"]: pub})
-            if len(meduzaUrlPubMap) >= maxSize:
-                return list(meduzaUrlPubMap.values())
-    return list(meduzaUrlPubMap.values())
+            pub.update({"company_id": company_id})
+            meduza_url_pub_map.update({pub["url"]: pub})
+            if len(meduza_url_pub_map) >= maxSize:
+                return list(meduza_url_pub_map.values())
+    return list(meduza_url_pub_map.values())
 
 
-def getLiveContent(pub):
+def get_live_content(pub):
     content = ""
     body = pub["content"]
     if "lead" in body:
@@ -32,11 +35,11 @@ def getLiveContent(pub):
         items = body["broadcast"]["items"]
         for item in list(items.values()):
             if "blocks" in item:
-                content += parseBlocks(item["blocks"])
+                content += parse_blocks(item["blocks"])
     return content
 
 
-def parseBlocks(blocks):
+def parse_blocks(blocks):
     content = ""
     for block in blocks:
         if block["type"] == "p" or block["type"] == "h3" or block["type"] == "lead":
@@ -44,14 +47,14 @@ def parseBlocks(blocks):
         if block["type"] == "image":
             content += block["data"]["caption"] if "caption" in block["data"] else ""
         if block["type"] == "grouped":
-            content += parseBlocks(block["data"])
+            content += parse_blocks(block["data"])
         content += "\n"
     return content
 
 
-def getPubContent(pub):
+def get_pub_content(pub):
     if pub["layout"] == "live":
-        return getLiveContent(pub)
+        return get_live_content(pub)
     body = pub["content"]
     content = ""
     if "head" in body:
@@ -62,25 +65,26 @@ def getPubContent(pub):
             if item["type"] == "simple_title":
                 content += item["data"]["first"] + "\n"
     if "blocks" in body:
-        content += parseBlocks(body["blocks"])
+        content += parse_blocks(body["blocks"])
     if "slides" in body:
         for slide in body["slides"]:
-            content += parseBlocks(slide["blocks"])
+            content += parse_blocks(slide["blocks"])
     return content
 
 
-def getMeduzaMentionsByKeywords(keywords):
-    pubs = getMeduzaPubsByKeywords(keywords)
+def get_meduza_mentions_for_companies(companies):
+    pubs = get_meduza_pubs_for_companies(companies)
     mentions = []
     for pub in pubs:
-        content = getPubContent(pub)
+        content = get_pub_content(pub)
         content = re.sub("<.*?>", "", content)
         mentions.append(dict({
             "url": "meduza.io/" + pub["url"],
+            "company_id": pub["company_id"],
             "title": pub["title"],
             "timestamp": pub["datetime"],
             "content": content,
-            "type": "news"
+            "mention_type": "news"
         }))
     return mentions
 

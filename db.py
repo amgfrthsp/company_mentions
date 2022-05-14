@@ -8,6 +8,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import select
+from sqlalchemy import types
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -52,6 +53,22 @@ class Company(Base):
 
     def __repr__(self):
         return f"Company(id={self.id!r}, name={self.name!r})"
+
+
+class Mention(Base):
+    __tablename__ = "mentions"
+    id = Column(Integer, primary_key=True)
+    company_id = Column(Integer)
+    url = Column(String)
+    title = Column(String)
+    timestamp = Column(Integer)
+    content = Column(String)
+    type = Column(types.Enum)
+    verdict = Column(types.JSON)
+    is_sent = Column(types.BOOLEAN)
+
+    def __repr__(self):
+        return f"Mention: id={self.id!r}, title={self.title!r}"
 
 
 async def create_tables(engine):
@@ -112,3 +129,8 @@ async def delete_subscription(user: User, company: Company):
 
 async def get_subscriptions(user: User) -> list:
     return user.companies
+
+
+async def add_mention(session, mention: Mention):
+    session.add(mention)
+    logging.info(f"Mention {mention.title} added to mentions database")

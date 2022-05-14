@@ -1,6 +1,6 @@
 from content_extractor import meduza_getter
 import db
-import logic
+from bot import logic
 
 
 def get_content(companies):

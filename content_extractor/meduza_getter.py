@@ -84,7 +84,7 @@ def get_meduza_mentions_for_companies(companies):
             "title": pub["title"],
             "timestamp": pub["datetime"],
             "content": content,
-            "mention_type": "news"
+            "type": "news"
         }))
     return mentions
 

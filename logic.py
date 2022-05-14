@@ -6,7 +6,7 @@ engine = None
 Session = sessionmaker(class_=AsyncSession)
 
 
-async def initialize():
+async def initialize_database():
     global engine
     engine = db.get_engine()
     await db.create_tables(engine)
@@ -14,7 +14,7 @@ async def initialize():
     Session.configure(bind=engine)
 
 
-async def start(telegram_user_id: int):
+async def start_bot(telegram_user_id: int):
     async with Session() as session:
         await db.find_or_create_user(session, telegram_user_id)
         await session.commit()

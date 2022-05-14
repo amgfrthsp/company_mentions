@@ -24,7 +24,7 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE):
     :param context:
     :return:
     """
-    await logic.start(update.effective_user.id)
+    await logic.start_bot(update.effective_user.id)
     await update.message.reply_text("Привет! Используй /subscribe <company> для получения уведомлений")
 
 
@@ -86,7 +86,7 @@ async def get_subscriptions(update: Update, context: CallbackContext.DEFAULT_TYP
 
 
 async def async_main():
-    await logic.initialize()
+    await logic.initialize_database()
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

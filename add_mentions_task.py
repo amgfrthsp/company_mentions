@@ -1,5 +1,6 @@
 from content_extractor import meduza_getter
 import db
+import logic
 
 
 def get_content(companies):
@@ -22,3 +23,4 @@ async def add_mentions_for_companies(companies):
             verdict=None,
             is_sent=False
         )
+        await logic.add_mention(mention)

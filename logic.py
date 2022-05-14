@@ -42,3 +42,10 @@ async def get_subscriptions(telegram_user_id: int) -> list:
         subscriptions = [company.name for company in await db.get_subscriptions(user)]
         await session.commit()
     return subscriptions
+
+
+async def add_mention(mention: db.Mention) -> db.Mention:
+    async with Session() as session:
+        await db.add_mention(session, mention)
+        await session.commit()
+    return mention

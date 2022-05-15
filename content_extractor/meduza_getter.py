@@ -4,7 +4,7 @@ import re
 from models import Mention, MentionTypes
 
 
-def get_meduza_raw_pubs(company_name, maxSize=5):
+def get_raw_pubs(company_name, maxSize=5):
     meduza_url_pub_map = {}
     pubs = meduza.search(company_name)
     for pub in pubs:
@@ -71,7 +71,7 @@ def get_pub_content(pub):
 
 
 def get_last_mentions(company_name) -> list:
-    pubs = get_meduza_raw_pubs(company_name)
+    pubs = get_raw_pubs(company_name)
     mentions = []
     for pub in pubs:
         content = get_pub_content(pub)

@@ -1,6 +1,4 @@
 import db
-import logging
-from models import Mention
 
 
 async def initialize_database():

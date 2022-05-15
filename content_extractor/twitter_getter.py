@@ -40,7 +40,7 @@ def connect_to_endpoint(url):
     return response.json()
 
 
-def get_last_mentions(company_name) -> list[Mention]:
+def get_last_mentions(company_name) -> list:
     mentions = []
 
     url = create_news_url(company_name)

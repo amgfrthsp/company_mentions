@@ -57,7 +57,7 @@ class Company(Base):
 class Mention(Base):
     __tablename__ = "mentions"
     id = Column(Integer, primary_key=True)
-    company_id = Column(Integer)
+    company_name = Column(String)
     title = Column(String)
     content = Column(String)
     url = Column(String)
@@ -140,17 +140,14 @@ async def get_subscriptions(user: User) -> list:
 
 async def get_all_companies(session: AsyncSession) -> list:
     stmt = select(Company)
-    return (await session.scalars(stmt)).all()
-
-
-# async def add_mention(session: AsyncSession, mention: Mention):
-#     session.add(mention)
-#     logging.info(f"Mention {mention.title} added to mentions database")
+    companies = (await session.scalars(stmt)).all()
+    logging.info("%d companies returned", len(companies))
+    return companies
 
 
 async def create_mention(session: AsyncSession, company_name: str, title: str, content: str, url: str, timestamp: int, type):
     new_mention = Mention(
-        company_id=company_name,
+        company_name=company_name,
         title=title,
         content=content,
         url=url,

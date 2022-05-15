@@ -2,9 +2,10 @@ import logging
 
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import Table, UniqueConstraint, Column, ForeignKey, Integer, String, Boolean, Enum
-from sqlalchemy import select, types, update
+from sqlalchemy import select
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import JSON
 
 import models
 
@@ -64,7 +65,7 @@ class Mention(Base):
     url = Column(String)
     timestamp = Column(Integer)
     type = Column(Enum(models.MentionTypes))
-    verdict = Column(types.JSON)
+    verdict = Column(JSON)
     is_sent = Column(Boolean)
 
     __table_args__ = (UniqueConstraint("url", name="unique_url"),)
@@ -157,6 +158,10 @@ async def create_mention(session: AsyncSession,
                          type,
                          verdict=None,
                          is_sent=False):
+    stmt = select(Mention).where(Mention.url == url)
+    mention = (await session.scalars(stmt)).one_or_none()
+    if mention:
+        return
     new_mention = Mention(
         company_name=company_name,
         title=title,
@@ -172,7 +177,7 @@ async def create_mention(session: AsyncSession,
 
 
 async def get_unclassified_mentions(session: AsyncSession) -> list:
-    stmt = select(Mention).where(Mention.verdict == None)
+    stmt = select(Mention).where(Mention.verdict == JSON.NULL)
     mentions = (await session.scalars(stmt)).all()
     logging.info("%d unclassified mentions returned", len(mentions))
     return mentions
@@ -180,7 +185,8 @@ async def get_unclassified_mentions(session: AsyncSession) -> list:
 
 async def add_classified_mentions(session: AsyncSession, mentions):
     for mention in mentions:
-        stmt = update(Mention).where(Mention.id == mention.id).values(verdict=mention.verdict)
-        await session.execute(stmt)
-        await session.commit()
+        stmt = select(Mention).where(Mention.id == mention.id)
+        found_mention = (await session.scalars(stmt)).one_or_none()
+        if found_mention:
+            found_mention.verdict = mention.verdict
     logging.info("classified %d mentions", len(mentions))

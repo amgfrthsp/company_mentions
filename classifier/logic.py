@@ -9,6 +9,7 @@ async def initialize_database():
 
 async def get_unclassified_mentions() -> list:
     async with db.Session() as session:
+        unclassified = await db.get_unclassified_mentions(session)
         mentions = [Mention(id=mention.id,
                             company_name=mention.company_name,
                             title=mention.title,
@@ -16,7 +17,7 @@ async def get_unclassified_mentions() -> list:
                             url=mention.url,
                             timestamp=mention.timestamp,
                             type=mention.type,
-                            verdict=mention.verdict) for mention in await db.get_unclassified_mentions(session)]
+                            verdict=mention.verdict) for mention in unclassified]
         await session.commit()
     return mentions
 

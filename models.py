@@ -1,3 +1,4 @@
+import typing
 from dataclasses import dataclass
 from enum import Enum
 
@@ -17,3 +18,4 @@ class Mention:
     timestamp: int
     type: MentionTypes
     verdict: typing.Any
+

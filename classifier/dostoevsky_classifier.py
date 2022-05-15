@@ -1,17 +1,22 @@
 from dostoevsky.tokenization import RegexTokenizer
 from dostoevsky.models import FastTextSocialNetworkModel
 
+from models import ClassifiedMention
+
 tokenizer = RegexTokenizer()
 model = FastTextSocialNetworkModel(tokenizer=tokenizer)
 
 
-def classifyMentions(mentions):
-    messages = [mention["content"] for mention in mentions]
-    classified = model.predict(messages, k=2)
+def classify(mentions):
+    messages = [mention.content for mention in mentions]
+    verdicts = model.predict(messages, k=2)
 
-    for i in range(0, len(messages)):
-        mentions[i].update({"verdict": {"negative": classified[i].get("negative"),
-                                        "positive": classified[i].get("positive"),
-                                        "neutral": classified[i].get("neutral")}
-                            })
-    return mentions
+    classified_mentions = []
+
+    for i, verdict in enumerate(verdicts):
+        classified_mentions.append(ClassifiedMention(
+            url=mentions[i].url,
+            positive=verdict.get("positive"),
+            neutral=verdict.get("neutral"),
+            negative=verdict.get("negative")))
+    return classified_mentions

@@ -1,3 +1,4 @@
+import typing
 from dataclasses import dataclass
 from enum import Enum
 
@@ -15,3 +16,12 @@ class Mention:
     url: str
     timestamp: int
     type: MentionTypes
+
+
+@dataclass
+class ClassifiedMention:
+    url: str
+    positive: float
+    neutral: float
+    negative: float
+

@@ -1,7 +1,8 @@
 import logging
 
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy import Table, UniqueConstraint, Column, ForeignKey, Integer, String, Boolean, Enum, select, types
+from sqlalchemy import Table, UniqueConstraint, Column, ForeignKey, Integer, String, Boolean, Enum
+from sqlalchemy import select, types, update
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -65,6 +66,8 @@ class Mention(Base):
     type = Column(Enum(models.MentionTypes))
     verdict = Column(types.JSON)
     is_sent = Column(Boolean)
+
+    __table_args__ = (UniqueConstraint("url", name="unique_url"),)
 
     def __repr__(self):
         return f"Mention: id={self.id!r}, title={self.title!r}"
@@ -145,7 +148,15 @@ async def get_all_companies(session: AsyncSession) -> list:
     return companies
 
 
-async def create_mention(session: AsyncSession, company_name: str, title: str, content: str, url: str, timestamp: int, type):
+async def create_mention(session: AsyncSession,
+                         company_name: str,
+                         title: str,
+                         content: str,
+                         url: str,
+                         timestamp: int,
+                         type,
+                         verdict=None,
+                         is_sent=False):
     new_mention = Mention(
         company_name=company_name,
         title=title,
@@ -153,8 +164,23 @@ async def create_mention(session: AsyncSession, company_name: str, title: str, c
         url=url,
         timestamp=timestamp,
         type=type,
-        verdict=None,
-        is_sent=False
+        verdict=verdict,
+        is_sent=is_sent
     )
     session.add(new_mention)
     logging.info(f"Mention of {company_name} added to mentions database")
+
+
+async def get_unclassified_mentions(session: AsyncSession) -> list:
+    stmt = select(Mention).where(Mention.verdict == None)
+    mentions = (await session.scalars(stmt)).all()
+    logging.info("%d unclassified mentions returned", len(mentions))
+    return mentions
+
+
+async def add_classified_mentions(session: AsyncSession, mentions):
+    for mention in mentions:
+        stmt = update(Mention).where(Mention.id == mention.id).values(verdict=mention.verdict)
+        await session.execute(stmt)
+        await session.commit()
+    logging.info("classified %d mentions", len(mentions))

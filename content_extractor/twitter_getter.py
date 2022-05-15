@@ -47,23 +47,27 @@ def get_last_mentions(company_name) -> list:
     json_response = connect_to_endpoint(url)
     if json_response["meta"]["result_count"] != 0:
         for tweet in json_response["data"]:
-            mentions.append(Mention(company_name=company_name,
+            mentions.append(Mention(id=0,
+                                    company_name=company_name,
                                     title="Tweet",
                                     content=tweet["text"],
                                     url=f'https://twitter.com/anyuser/status/{tweet["id"]}',
                                     timestamp=tweet["created_at"],
-                                    type=MentionTypes.NEWS))
+                                    type=MentionTypes.NEWS,
+                                    verdict=None))
 
     url = create_social_medias_url(company_name)
     json_response = connect_to_endpoint(url)
     if json_response["meta"]["result_count"] != 0:
         for tweet in json_response["data"]:
-            mentions.append(Mention(company_name=company_name,
+            mentions.append(Mention(id=0,
+                                    company_name=company_name,
                                     title="Tweet",
                                     content=tweet["text"],
                                     url=f'https://twitter.com/anyuser/status/{tweet["id"]}',
                                     timestamp=tweet["created_at"],
-                                    type=MentionTypes.POST))
+                                    type=MentionTypes.POST,
+                                    verdict=None))
     return mentions
 
 

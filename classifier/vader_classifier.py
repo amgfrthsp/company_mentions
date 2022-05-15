@@ -5,7 +5,12 @@ analyzer = SentimentIntensityAnalyzer()
 limit_of_length = 5000 - 5
 
 
-def classifyPubs(pubs):
-    messages = [ts.google(pub["content"][:limit_of_length]) for pub in pubs]
-    classified = [analyzer.polarity_scores(message) for message in messages]
-    return classified
+def classify(mentions):
+    messages = [ts.google(mention.content[:limit_of_length]) for mention in mentions]
+    verdicts = [analyzer.polarity_scores(message) for message in messages]
+    for i in range(0, len(verdicts)):
+        mentions[i].verdict = {"negative": verdicts[i].get("neg"),
+                               "positive": verdicts[i].get("pos"),
+                               "neutral": verdicts[i].get("neu")}
+
+    return mentions

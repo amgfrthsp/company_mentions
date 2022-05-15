@@ -13,11 +13,10 @@ def classify(mentions):
 
     classified_mentions = []
 
-    for i in range(0, len(messages)):
+    for i, verdict in enumerate(verdicts):
         classified_mentions.append(ClassifiedMention(
-            id=0,
-            base_mention_id=mentions[i].id,
-            positive=verdicts[i].get("positive"),
-            neutral=verdicts[i].get("neutral"),
-            negative=verdicts[i].get("negative")))
+            url=mentions[i].url,
+            positive=verdict.get("positive"),
+            neutral=verdict.get("neutral"),
+            negative=verdict.get("negative")))
     return classified_mentions

@@ -10,7 +10,6 @@ class MentionTypes(Enum):
 
 @dataclass
 class Mention:
-    id: int
     company_name: str
     title: str
     content: str
@@ -21,8 +20,7 @@ class Mention:
 
 @dataclass
 class ClassifiedMention:
-    id: int
-    base_mention_id: int
+    url: str
     positive: float
     neutral: float
     negative: float

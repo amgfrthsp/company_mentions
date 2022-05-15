@@ -66,8 +66,9 @@ class Mention(Base):
     is_sent = Column(Boolean)
 
     verdict = relationship(
-        "ClassifiedMention",
-        back_populates="base_mention",
+        "Verdict",
+        # back_populates="base_mention",
+        lazy="selectin",
         uselist=False)
 
     __table_args__ = (UniqueConstraint("url", name="unique_url"),)
@@ -76,17 +77,16 @@ class Mention(Base):
         return f"Mention: id={self.id!r}, title={self.title!r}"
 
 
-class ClassifiedMention(Base):
-    __tablename__ = "classified_mentions"
-    id = Column(Integer, primary_key=True)
-    base_mention_id = Column(Integer, ForeignKey("mentions.id"))
+class Verdict(Base):
+    __tablename__ = "verdicts"
+    id = Column(Integer, ForeignKey("mentions.id"), primary_key=True)
     positive = Column(Float)
     neutral = Column(Float)
     negative = Column(Float)
 
-    base_mention = relationship(
-        "Mention",
-        back_populates="verdict")
+    # base_mention = relationship(
+    #     "Mention",
+    #     back_populates="verdict")
 
     def __repr__(self):
         return f"Classified mention: id={self.id!r}"
@@ -108,7 +108,6 @@ async def create_tables(engine):
 
 def get_engine():
     try:
-        # +aiosqlite
         engine = create_async_engine('sqlite+aiosqlite:///database.db')
         logging.info("Database engine connected")
         return engine
@@ -173,12 +172,13 @@ async def create_mention(session: AsyncSession,
                          content: str,
                          url: str,
                          timestamp: int,
-                         type,
+                         type: Enum,
                          is_sent=False):
     stmt = select(Mention).where(Mention.url == url)
     mention = (await session.scalars(stmt)).one_or_none()
     if mention:
         return
+
     new_mention = Mention(
         company_name=company_name,
         title=title,
@@ -199,12 +199,31 @@ async def get_unclassified_mentions(session: AsyncSession) -> list:
     return mentions
 
 
-async def add_classified_mentions(session: AsyncSession, mentions):
-    for mention in mentions:
-        new_mention = ClassifiedMention(
-            base_mention_id=mention.base_mention_id,
-            positive=mention.positive,
-            neutral=mention.neutral,
-            negative=mention.negative)
-        session.add(new_mention)
-    logging.info("classified %d mentions", len(mentions))
+async def get_unclassified_mention(session: AsyncSession, url: str) -> Mention:
+    stmt = select(Mention).where(Mention.url == url)
+    mention = (await session.scalars(stmt)).one_or_none()
+    if not mention:
+        raise "Error"
+    logging.info("Unclassified mentions returned")
+    return mention
+
+
+async def add_classified_mention(mention: Mention, positive: float, neutral: float, negative: float):
+    mention.verdict = Verdict(positive=positive, neutral=neutral, negative=negative)
+    logging.info("classified mention")
+
+
+# async def add_classified_mentions(session: AsyncSession, mentions):
+#     for mention in mentions:
+#         stmt = select(Mention).where(Mention.url == mention.url)
+#         mention = (await session.scalars(stmt)).one_or_none()
+#         if mention:
+#             return
+#
+#         new_mention = ClassifiedMention(
+#             base_mention_id=mention.base_mention_id,
+#             positive=mention.positive,
+#             neutral=mention.neutral,
+#             negative=mention.negative)
+#         session.add(new_mention)
+#     logging.info("classified %d mentions", len(mentions))

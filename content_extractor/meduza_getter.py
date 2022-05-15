@@ -76,8 +76,7 @@ def get_last_mentions(company_name) -> list:
     for pub in pubs:
         content = get_pub_content(pub)
         content = re.sub("<.*?>", "", content)
-        mentions.append(Mention(id=0,
-                                company_name=company_name,
+        mentions.append(Mention(company_name=company_name,
                                 url="meduza.io/" + pub["url"],
                                 title=pub["title"],
                                 timestamp=pub["datetime"],

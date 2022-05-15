@@ -17,5 +17,13 @@ class Mention:
     url: str
     timestamp: int
     type: MentionTypes
-    verdict: typing.Any
+
+
+@dataclass
+class ClassifiedMention:
+    id: int
+    base_mention_id: int
+    positive: float
+    neutral: float
+    negative: float
 

@@ -1,17 +1,15 @@
 import logging
 
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy import Table, UniqueConstraint, Column, ForeignKey, Integer, String, Boolean, Enum
+from sqlalchemy import Table, UniqueConstraint, Column, ForeignKey, Integer, String, Boolean, Enum, Float
 from sqlalchemy import select
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import JSON
 
 import models
 
 engine = None
 Session = sessionmaker(class_=AsyncSession)
-
 
 Base = declarative_base()
 
@@ -65,13 +63,33 @@ class Mention(Base):
     url = Column(String)
     timestamp = Column(Integer)
     type = Column(Enum(models.MentionTypes))
-    verdict = Column(JSON)
     is_sent = Column(Boolean)
+
+    verdict = relationship(
+        "ClassifiedMention",
+        back_populates="base_mention",
+        uselist=False)
 
     __table_args__ = (UniqueConstraint("url", name="unique_url"),)
 
     def __repr__(self):
         return f"Mention: id={self.id!r}, title={self.title!r}"
+
+
+class ClassifiedMention(Base):
+    __tablename__ = "classified_mentions"
+    id = Column(Integer, primary_key=True)
+    base_mention_id = Column(Integer, ForeignKey("mentions.id"))
+    positive = Column(Float)
+    neutral = Column(Float)
+    negative = Column(Float)
+
+    base_mention = relationship(
+        "Mention",
+        back_populates="verdict")
+
+    def __repr__(self):
+        return f"Classified mention: id={self.id!r}"
 
 
 async def initialize():
@@ -156,7 +174,6 @@ async def create_mention(session: AsyncSession,
                          url: str,
                          timestamp: int,
                          type,
-                         verdict=None,
                          is_sent=False):
     stmt = select(Mention).where(Mention.url == url)
     mention = (await session.scalars(stmt)).one_or_none()
@@ -169,7 +186,6 @@ async def create_mention(session: AsyncSession,
         url=url,
         timestamp=timestamp,
         type=type,
-        verdict=verdict,
         is_sent=is_sent
     )
     session.add(new_mention)
@@ -177,7 +193,7 @@ async def create_mention(session: AsyncSession,
 
 
 async def get_unclassified_mentions(session: AsyncSession) -> list:
-    stmt = select(Mention).where(Mention.verdict == JSON.NULL)
+    stmt = select(Mention).where(Mention.verdict == None)
     mentions = (await session.scalars(stmt)).all()
     logging.info("%d unclassified mentions returned", len(mentions))
     return mentions
@@ -185,8 +201,10 @@ async def get_unclassified_mentions(session: AsyncSession) -> list:
 
 async def add_classified_mentions(session: AsyncSession, mentions):
     for mention in mentions:
-        stmt = select(Mention).where(Mention.id == mention.id)
-        found_mention = (await session.scalars(stmt)).one_or_none()
-        if found_mention:
-            found_mention.verdict = mention.verdict
+        new_mention = ClassifiedMention(
+            base_mention_id=mention.base_mention_id,
+            positive=mention.positive,
+            neutral=mention.neutral,
+            negative=mention.negative)
+        session.add(new_mention)
     logging.info("classified %d mentions", len(mentions))

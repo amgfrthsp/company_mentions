@@ -53,8 +53,7 @@ def get_last_mentions(company_name) -> list:
                                     content=tweet["text"],
                                     url=f'https://twitter.com/anyuser/status/{tweet["id"]}',
                                     timestamp=tweet["created_at"],
-                                    type=MentionTypes.NEWS,
-                                    verdict=None))
+                                    type=MentionTypes.NEWS))
 
     url = create_social_medias_url(company_name)
     json_response = connect_to_endpoint(url)
@@ -66,8 +65,7 @@ def get_last_mentions(company_name) -> list:
                                     content=tweet["text"],
                                     url=f'https://twitter.com/anyuser/status/{tweet["id"]}',
                                     timestamp=tweet["created_at"],
-                                    type=MentionTypes.POST,
-                                    verdict=None))
+                                    type=MentionTypes.POST))
     return mentions
 
 

@@ -16,8 +16,7 @@ async def get_unclassified_mentions() -> list:
                             content=mention.content,
                             url=mention.url,
                             timestamp=mention.timestamp,
-                            type=mention.type,
-                            verdict=mention.verdict) for mention in unclassified]
+                            type=mention.type) for mention in unclassified]
         await session.commit()
     return mentions
 

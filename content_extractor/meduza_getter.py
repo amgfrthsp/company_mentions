@@ -82,6 +82,5 @@ def get_last_mentions(company_name) -> list:
                                 title=pub["title"],
                                 timestamp=pub["datetime"],
                                 content=content,
-                                type=MentionTypes.NEWS,
-                                verdict=None))
+                                type=MentionTypes.NEWS))
     return mentions

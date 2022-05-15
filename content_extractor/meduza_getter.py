@@ -8,7 +8,7 @@ def get_raw_pubs(company_name, maxSize=5):
     meduza_url_pub_map = {}
     pubs = meduza.search(company_name)
     for pub in pubs:
-        if pub == {}:
+        if not pub:
             continue
         meduza_url_pub_map.update({pub["url"]: pub})
         if len(meduza_url_pub_map) >= maxSize:

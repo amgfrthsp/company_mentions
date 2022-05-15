@@ -1,20 +1,18 @@
 import meduza
 import re
 
+from models import Mention, MentionTypes
 
-def get_meduza_pubs_for_companies(companies, maxSize=5):
+
+def get_raw_pubs(company_name, maxSize=5):
     meduza_url_pub_map = {}
-    for company_id_name in companies:
-        company_id = company_id_name[0]
-        company_name = company_id_name[1]
-        pubs = meduza.search(company_name)
-        for pub in pubs:
-            if pub == {}:
-                continue
-            pub.update({"company_id": company_id})
-            meduza_url_pub_map.update({pub["url"]: pub})
-            if len(meduza_url_pub_map) >= maxSize:
-                return list(meduza_url_pub_map.values())
+    pubs = meduza.search(company_name)
+    for pub in pubs:
+        if not pub:
+            continue
+        meduza_url_pub_map.update({pub["url"]: pub})
+        if len(meduza_url_pub_map) >= maxSize:
+            return list(meduza_url_pub_map.values())
     return list(meduza_url_pub_map.values())
 
 
@@ -72,19 +70,16 @@ def get_pub_content(pub):
     return content
 
 
-def get_meduza_mentions_for_companies(companies):
-    pubs = get_meduza_pubs_for_companies(companies)
+def get_last_mentions(company_name) -> list:
+    pubs = get_raw_pubs(company_name)
     mentions = []
     for pub in pubs:
         content = get_pub_content(pub)
         content = re.sub("<.*?>", "", content)
-        mentions.append(dict({
-            "url": "meduza.io/" + pub["url"],
-            "company_id": pub["company_id"],
-            "title": pub["title"],
-            "timestamp": pub["datetime"],
-            "content": content,
-            "type": "news"
-        }))
+        mentions.append(Mention(company_name=company_name,
+                                url="meduza.io/" + pub["url"],
+                                title=pub["title"],
+                                timestamp=pub["datetime"],
+                                content=content,
+                                type=MentionTypes.NEWS))
     return mentions
-

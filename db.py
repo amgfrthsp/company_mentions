@@ -1,16 +1,15 @@
 import logging
 
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy import Table
-from sqlalchemy import UniqueConstraint
-from sqlalchemy import Column
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import select
-from sqlalchemy import types
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy import Table, UniqueConstraint, Column, ForeignKey, Integer, String, Boolean, Enum, select, types
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
+
+import models
+
+engine = None
+Session = sessionmaker(class_=AsyncSession)
+
 
 Base = declarative_base()
 
@@ -58,22 +57,31 @@ class Company(Base):
 class Mention(Base):
     __tablename__ = "mentions"
     id = Column(Integer, primary_key=True)
-    company_id = Column(Integer)
-    url = Column(String)
+    company_name = Column(String)
     title = Column(String)
-    timestamp = Column(Integer)
     content = Column(String)
-    type = Column(types.Enum)
+    url = Column(String)
+    timestamp = Column(Integer)
+    type = Column(Enum(models.MentionTypes))
     verdict = Column(types.JSON)
-    is_sent = Column(types.BOOLEAN)
+    is_sent = Column(Boolean)
 
     def __repr__(self):
         return f"Mention: id={self.id!r}, title={self.title!r}"
 
 
+async def initialize():
+    global engine
+    engine = get_engine()
+    await create_tables(engine)
+
+    Session.configure(bind=engine)
+
+
 async def create_tables(engine):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    logging.info("Tables created")
 
 
 def get_engine():
@@ -86,8 +94,7 @@ def get_engine():
         logging.error("Database error")
 
 
-async def find_or_create_user(session, user_id: int) -> User:
-    # .join(Company)
+async def find_or_create_user(session: AsyncSession, user_id: int) -> User:
     stmt = select(User).where(User.telegram_user_id == user_id)
     user_db = (await session.scalars(stmt)).one_or_none()
     if user_db:
@@ -100,7 +107,7 @@ async def find_or_create_user(session, user_id: int) -> User:
     return new_user
 
 
-async def find_or_create_company(session, company_name: str) -> Company:
+async def find_or_create_company(session: AsyncSession, company_name: str) -> Company:
     stmt = select(Company).where(Company.name == company_name)
     company_db = (await session.scalars(stmt)).one_or_none()
     if company_db:
@@ -131,6 +138,23 @@ async def get_subscriptions(user: User) -> list:
     return user.companies
 
 
-async def add_mention(session, mention: Mention):
-    session.add(mention)
-    logging.info(f"Mention {mention.title} added to mentions database")
+async def get_all_companies(session: AsyncSession) -> list:
+    stmt = select(Company)
+    companies = (await session.scalars(stmt)).all()
+    logging.info("%d companies returned", len(companies))
+    return companies
+
+
+async def create_mention(session: AsyncSession, company_name: str, title: str, content: str, url: str, timestamp: int, type):
+    new_mention = Mention(
+        company_name=company_name,
+        title=title,
+        content=content,
+        url=url,
+        timestamp=timestamp,
+        type=type,
+        verdict=None,
+        is_sent=False
+    )
+    session.add(new_mention)
+    logging.info(f"Mention of {company_name} added to mentions database")

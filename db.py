@@ -24,6 +24,8 @@ class User(Base):
     Define table users(id INTEGER primary_key, telegram_user_id INTEGER)
     """
     __tablename__ = "users"
+    __table_args__ = (UniqueConstraint("telegram_user_id", name="unique_telegram_user_id"),)
+
     id = Column(Integer, primary_key=True)
     telegram_user_id = Column(Integer)
     companies = relationship(
@@ -31,7 +33,6 @@ class User(Base):
         secondary=users_companies_association_table,
         back_populates="users",
         lazy="selectin")
-    __table_args__ = (UniqueConstraint("telegram_user_id", name="unique_telegram_user_id"),)
 
     def __repr__(self):
         return f"User(id={self.id!r}, telegram_user_id={self.telegram_user_id!r})"
@@ -42,13 +43,22 @@ class Company(Base):
     Define table companies(id INTEGER primary_key, name VARCHAR)
     """
     __tablename__ = "companies"
+    __table_args__ = (UniqueConstraint("name", name="unique_name"),)
+
     id = Column(Integer, primary_key=True)
     name = Column(String)
+
     users = relationship(
         "User",
         secondary=users_companies_association_table,
         back_populates="companies")
-    __table_args__ = (UniqueConstraint("name", name="unique_name"),)
+
+    mentions = relationship(
+        "Mention",
+        back_populates="company",
+        uselist=False
+    )
+
 
     def __repr__(self):
         return f"Company(id={self.id!r}, name={self.name!r})"
@@ -56,8 +66,10 @@ class Company(Base):
 
 class Mention(Base):
     __tablename__ = "mentions"
+    __table_args__ = (UniqueConstraint("url", name="unique_url"),)
+
     id = Column(Integer, primary_key=True)
-    company_name = Column(String)
+    company_id = Column(Integer, ForeignKey('companies.id'))
     title = Column(String)
     content = Column(String)
     url = Column(String)
@@ -65,13 +77,17 @@ class Mention(Base):
     type = Column(Enum(models.MentionTypes))
     is_sent = Column(Boolean)
 
+    company = relationship(
+        "Company",
+        back_populates="mentions",
+        lazy="selectin",
+    )
+
     verdict = relationship(
         "Verdict",
         # back_populates="base_mention",
         lazy="selectin",
         uselist=False)
-
-    __table_args__ = (UniqueConstraint("url", name="unique_url"),)
 
     def __repr__(self):
         return f"Mention: id={self.id!r}, title={self.title!r}"
@@ -167,7 +183,7 @@ async def get_all_companies(session: AsyncSession) -> list:
 
 
 async def create_mention(session: AsyncSession,
-                         company_name: str,
+                         company_id: int,
                          title: str,
                          content: str,
                          url: str,
@@ -180,7 +196,7 @@ async def create_mention(session: AsyncSession,
         return
 
     new_mention = Mention(
-        company_name=company_name,
+        company_id=company_id,
         title=title,
         content=content,
         url=url,
@@ -189,10 +205,10 @@ async def create_mention(session: AsyncSession,
         is_sent=is_sent
     )
     session.add(new_mention)
-    logging.info(f"Mention of {company_name} added to mentions database")
+    logging.info(f"Mention of {company_id} added to mentions database")
 
 
-async def get_unclassified_mentions(session: AsyncSession) -> list:
+async def get_unclassified_mentions(session: AsyncSession) -> list[Mention]:
     stmt = select(Mention).where(Mention.verdict == None)
     mentions = (await session.scalars(stmt)).all()
     logging.info("%d unclassified mentions returned", len(mentions))
@@ -211,7 +227,6 @@ async def get_unclassified_mention(session: AsyncSession, url: str) -> Mention:
 async def add_classified_mention(mention: Mention, positive: float, neutral: float, negative: float):
     mention.verdict = Verdict(positive=positive, neutral=neutral, negative=negative)
     logging.info("classified mention")
-
 
 # async def add_classified_mentions(session: AsyncSession, mentions):
 #     for mention in mentions:

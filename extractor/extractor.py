@@ -6,7 +6,7 @@ import asyncio
 import logging
 
 from extractors import meduza_extractor, twitter_extractor
-from extractor import logic
+import logic
 
 # define logging format
 logging.basicConfig(

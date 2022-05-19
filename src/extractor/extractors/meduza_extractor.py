@@ -5,11 +5,13 @@ import re
 
 from models import Mention, MentionTypes
 
+NAME = "meduza"
+
 
 def get_raw_pubs(company_name, maxSize=10000):
     meduza_url_pub_map = {}
     pubs = meduza.search(company_name)
-    while 1:
+    while True:
         pub = None
         try:
             pub = next(pubs)

@@ -23,11 +23,10 @@ async def async_main():
 
     logging.info("started extracting mentions...")
     extractors = [twitter_extractor, meduza_extractor]
-    extractor_names = ["twitter", "meduza"]
-    for i, extractor in enumerate(extractors):
-        logging.info(f"started monitoring {extractor_names[i]}...")
+    for extractor in extractors:
+        logging.info(f"started monitoring {extractor.NAME}...")
         await logic.extract_last_mentions(extractor)
-        logging.info(f"finished monitoring {extractor_names[i]}")
+        logging.info(f"finished monitoring {extractor.NAME}")
     logging.info("finished extracting mentions")
 
 

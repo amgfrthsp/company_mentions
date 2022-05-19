@@ -1,8 +1,9 @@
-import logging
 import json
 import requests
 from decouple import config
 from models import Mention, MentionTypes
+
+NAME = "twitter"
 
 
 def create_url(query: str) -> str:

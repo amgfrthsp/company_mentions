@@ -1,3 +1,5 @@
+import logging
+
 import meduza
 import re
 
@@ -40,13 +42,16 @@ def get_live_content(pub):
 def parse_blocks(blocks):
     content = ""
     for block in blocks:
-        if block["type"] == "p" or block["type"] == "h3" or block["type"] == "lead":
-            content += block["data"]
-        if block["type"] == "image":
-            content += block["data"]["caption"] if "caption" in block["data"] else ""
-        if block["type"] == "grouped":
-            content += parse_blocks(block["data"])
-        content += "\n"
+        try:
+            if block["type"] == "p" or block["type"] == "h3" or block["type"] == "lead":
+                content += block["data"]
+            if block["type"] == "image":
+                content += block["data"]["caption"] if "caption" in block["data"] else ""
+            if block["type"] == "grouped":
+                content += parse_blocks(block["data"])
+            content += "\n"
+        except Exception as e:
+            logging.info(f"Meduza parser failed on block {block}", e)
     return content
 
 
@@ -70,7 +75,7 @@ def get_pub_content(pub):
     return content
 
 
-def get_last_mentions(company_name) -> list:
+def get_last_mentions(company_name) -> list[Mention]:
     pubs = get_raw_pubs(company_name)
     mentions = []
     for pub in pubs:

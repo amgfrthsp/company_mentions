@@ -32,7 +32,8 @@ class User(Base):
         "Company",
         secondary=users_companies_association_table,
         back_populates="users",
-        lazy="selectin")
+        lazy="selectin"
+    )
 
     def __repr__(self):
         return f"User(id={self.id!r}, telegram_user_id={self.telegram_user_id!r})"
@@ -51,14 +52,15 @@ class Company(Base):
     users = relationship(
         "User",
         secondary=users_companies_association_table,
-        back_populates="companies")
+        back_populates="companies",
+        lazy="selectin"
+    )
 
     mentions = relationship(
         "Mention",
         back_populates="company",
         uselist=False
     )
-
 
     def __repr__(self):
         return f"Company(id={self.id!r}, name={self.name!r})"
@@ -80,7 +82,7 @@ class Mention(Base):
     company = relationship(
         "Company",
         back_populates="mentions",
-        lazy="selectin",
+        lazy="selectin"
     )
 
     verdict = relationship(
@@ -90,7 +92,7 @@ class Mention(Base):
         uselist=False)
 
     def __repr__(self):
-        return f"Mention: id={self.id!r}, title={self.title!r}"
+        return f"Mention: id={self.id!r}, company={self.company.name!r}, title={self.title!r}"
 
 
 class Verdict(Base):
@@ -100,12 +102,14 @@ class Verdict(Base):
     neutral = Column(Float)
     negative = Column(Float)
 
-    # base_mention = relationship(
-    #     "Mention",
-    #     back_populates="verdict")
+    mention = relationship(
+        "Mention",
+        back_populates="verdict",
+        lazy="selectin",
+    )
 
     def __repr__(self):
-        return f"Classified mention: id={self.id!r}"
+        return f"Classified mention: id={self.id!r}, ({self.positive!r}, {self.neutral!r}, {self.negative!r})"
 
 
 async def initialize():
@@ -123,15 +127,18 @@ async def create_tables(engine):
 
 
 def get_engine():
+    """
+    Do connection to SQLite database.
+    """
     try:
         engine = create_async_engine('sqlite+aiosqlite:///database.db')
         logging.info("Database engine connected")
         return engine
-    except:
-        logging.error("Database error")
+    except Exception as e:
+        raise Exception("Database error", e)
 
 
-async def find_or_create_user(session: AsyncSession, user_id: int) -> User:
+async def get_or_create_user(session: AsyncSession, user_id: int) -> User:
     stmt = select(User).where(User.telegram_user_id == user_id)
     user_db = (await session.scalars(stmt)).one_or_none()
     if user_db:
@@ -144,7 +151,7 @@ async def find_or_create_user(session: AsyncSession, user_id: int) -> User:
     return new_user
 
 
-async def find_or_create_company(session: AsyncSession, company_name: str) -> Company:
+async def get_or_create_company(session: AsyncSession, company_name: str) -> Company:
     stmt = select(Company).where(Company.name == company_name)
     company_db = (await session.scalars(stmt)).one_or_none()
     if company_db:
@@ -159,26 +166,31 @@ async def find_or_create_company(session: AsyncSession, company_name: str) -> Co
 
 async def create_subscription(user: User, company: Company):
     if company in user.companies:
-        raise f"Subscription {user.telegram_user_id}-{company.name} already exists"
+        raise Exception(f"Subscription {user.telegram_user_id}-{company.name} already exists")
+
     user.companies.append(company)
     logging.info(f"Association between {user.telegram_user_id} and {company.name} is added to association database")
 
 
 async def delete_subscription(user: User, company: Company):
     if company not in user.companies:
-        raise f"Subscription {user.telegram_user_id}-{company.name} does not exist"
+        raise Exception(f"Subscription {user.telegram_user_id}-{company.name} does not exist")
+
     user.companies.remove(company)
     logging.info(f"Association between {user.telegram_user_id} and {company.name} is deleted from association database")
 
 
-async def get_subscriptions(user: User) -> list:
-    return user.companies
+async def get_all_unsent_mentions_sorted_by_company(session: AsyncSession) -> list[Mention]:
+    stmt = select(Mention).where(Mention.is_sent == False).order_by(Mention.company_id)
+    unsent_mentions_db = (await session.scalars(stmt)).all()
+    logging.info(f"{len(unsent_mentions_db)} unsent mentions returned")
+    return unsent_mentions_db
 
 
 async def get_all_companies(session: AsyncSession) -> list:
     stmt = select(Company)
     companies = (await session.scalars(stmt)).all()
-    logging.info("%d companies returned", len(companies))
+    logging.info(f"{len(companies)} companies returned")
     return companies
 
 
@@ -188,11 +200,12 @@ async def create_mention(session: AsyncSession,
                          content: str,
                          url: str,
                          timestamp: int,
-                         type: Enum,
+                         type: models.MentionTypes,
                          is_sent=False):
     stmt = select(Mention).where(Mention.url == url)
     mention = (await session.scalars(stmt)).one_or_none()
     if mention:
+        logging.info(f"Mention {url} already exists")
         return
 
     new_mention = Mention(
@@ -211,34 +224,5 @@ async def create_mention(session: AsyncSession,
 async def get_unclassified_mentions(session: AsyncSession) -> list[Mention]:
     stmt = select(Mention).where(Mention.verdict == None)
     mentions = (await session.scalars(stmt)).all()
-    logging.info("%d unclassified mentions returned", len(mentions))
+    logging.info(f"{len(mentions)} unclassified mentions returned")
     return mentions
-
-
-async def get_unclassified_mention(session: AsyncSession, url: str) -> Mention:
-    stmt = select(Mention).where(Mention.url == url)
-    mention = (await session.scalars(stmt)).one_or_none()
-    if not mention:
-        raise "Error"
-    logging.info("Unclassified mentions returned")
-    return mention
-
-
-async def add_classified_mention(mention: Mention, positive: float, neutral: float, negative: float):
-    mention.verdict = Verdict(positive=positive, neutral=neutral, negative=negative)
-    logging.info("classified mention")
-
-# async def add_classified_mentions(session: AsyncSession, mentions):
-#     for mention in mentions:
-#         stmt = select(Mention).where(Mention.url == mention.url)
-#         mention = (await session.scalars(stmt)).one_or_none()
-#         if mention:
-#             return
-#
-#         new_mention = ClassifiedMention(
-#             base_mention_id=mention.base_mention_id,
-#             positive=mention.positive,
-#             neutral=mention.neutral,
-#             negative=mention.negative)
-#         session.add(new_mention)
-#     logging.info("classified %d mentions", len(mentions))

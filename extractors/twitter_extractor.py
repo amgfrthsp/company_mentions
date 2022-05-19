@@ -12,12 +12,12 @@ def create_url(query: str) -> str:
 
 
 def create_news_url(company_name: str) -> str:
-    query = f'(("{company_name}" OR to:"{company_name}") (lang:en OR lang:ru) is:verified -is:retweet -is:reply -is:quote has:links) OR (from:"{company_name}")'
+    query = f'(("{company_name}") (lang:en OR lang:ru) is:verified -is:retweet -is:reply -is:quote has:links)'
     return create_url(query)
 
 
 def create_social_medias_url(company_name: str) -> str:
-    query = f'{company_name} (lang:en OR lang:ru) is:verified -is:retweet -is:reply -is:quote -has:links'
+    query = f'({company_name} OR from:"{company_name}") (lang:en OR lang:ru) is:verified -is:retweet -is:reply -is:quote -has:links'
     return create_url(query)
 
 

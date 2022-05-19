@@ -5,19 +5,19 @@ from decouple import config
 from models import Mention, MentionTypes
 
 
-def create_url(query):
+def create_url(query: str) -> str:
     tweet_fields = 'id,text,created_at'
     url = f'https://api.twitter.com/2/tweets/search/recent?query={query}&tweet.fields={tweet_fields}&max_results=100'
     return url
 
 
-def create_news_url(company_name):
-    query = f'(("{company_name}" OR to:"{company_name}") (lang:en OR lang:ru) is:verified -is:retweet -is:reply -is:quote has:links) OR (from:"{company_name}")'
+def create_news_url(company_name: str) -> str:
+    query = f'(("{company_name}") (lang:en OR lang:ru) is:verified -is:retweet -is:reply -is:quote has:links)'
     return create_url(query)
 
 
-def create_social_medias_url(company_name):
-    query = f'{company_name} (lang:en OR lang:ru) is:verified -is:retweet -is:reply -is:quote -has:links'
+def create_social_medias_url(company_name: str) -> str:
+    query = f'({company_name} OR from:"{company_name}") (lang:en OR lang:ru) is:verified -is:retweet -is:reply -is:quote -has:links'
     return create_url(query)
 
 
@@ -40,30 +40,32 @@ def connect_to_endpoint(url):
     return response.json()
 
 
-def get_last_mentions(company_name) -> list:
+def get_last_mentions(company_name) -> list[Mention]:
     mentions = []
 
     url = create_news_url(company_name)
     json_response = connect_to_endpoint(url)
     if json_response["meta"]["result_count"] != 0:
         for tweet in json_response["data"]:
-            mentions.append(Mention(company_name=company_name,
-                                    title="Tweet",
-                                    content=tweet["text"],
-                                    url=f'https://twitter.com/anyuser/status/{tweet["id"]}',
-                                    timestamp=tweet["created_at"],
-                                    type=MentionTypes.NEWS))
+            mentions.append(Mention(
+                company_name=company_name,
+                content=tweet["text"],
+                url=f'https://twitter.com/anyuser/status/{tweet["id"]}',
+                timestamp=tweet["created_at"],
+                type=MentionTypes.NEWS
+            ))
 
     url = create_social_medias_url(company_name)
     json_response = connect_to_endpoint(url)
     if json_response["meta"]["result_count"] != 0:
         for tweet in json_response["data"]:
-            mentions.append(Mention(company_name=company_name,
-                                    title="Tweet",
-                                    content=tweet["text"],
-                                    url=f'https://twitter.com/anyuser/status/{tweet["id"]}',
-                                    timestamp=tweet["created_at"],
-                                    type=MentionTypes.POST))
+            mentions.append(Mention(
+                company_name=company_name,
+                content=tweet["text"],
+                url=f'https://twitter.com/anyuser/status/{tweet["id"]}',
+                timestamp=tweet["created_at"],
+                type=MentionTypes.POST
+            ))
     return mentions
 
 

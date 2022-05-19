@@ -1,7 +1,15 @@
+import logging
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import functions, tables
-from models import Mention
+from src.database import functions, tables
+from src.models import Mention
+
+# define logging format
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
 
 async def initialize_database():

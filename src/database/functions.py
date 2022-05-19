@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-import models
-from database.tables import Base, User, Company, Mention
+from src import models
+from src.database.tables import Base, User, Company, Mention
 
 engine = None
 Session = sessionmaker(class_=AsyncSession)

@@ -5,7 +5,7 @@ Extractor find mentions of companies and brands in different media and store the
 import asyncio
 import logging
 
-from extractor.extractors import meduza_extractor, twitter_extractor
+from extractors import meduza_extractor, twitter_extractor
 import logic
 
 # define logging format
@@ -21,9 +21,11 @@ async def async_main():
     """
     await logic.initialize_database()
 
+    logging.info("started extracting mentions...")
     extractors = [twitter_extractor, meduza_extractor]
     for extractor in extractors:
         await logic.extract_last_mentions(extractor)
+    logging.info("finished extracting mentions")
 
 
 def main():

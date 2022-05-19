@@ -1,7 +1,7 @@
 import translators as ts
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-from models import Verdict
+from src.models import Verdict
 
 analyzer = SentimentIntensityAnalyzer()
 limit_of_length = 5000 - 5

@@ -3,13 +3,20 @@ import logging
 import meduza
 import re
 
-from models import Mention, MentionTypes
+from src.models import Mention, MentionTypes
 
 
-def get_raw_pubs(company_name, maxSize=5):
+def get_raw_pubs(company_name, maxSize=10000):
     meduza_url_pub_map = {}
     pubs = meduza.search(company_name)
-    for pub in pubs:
+    while 1:
+        pub = None
+        try:
+            pub = next(pubs)
+        except StopIteration:
+            break
+        except Exception as e:
+            logging.warning(f"unexpected exception from meduza extractor: {e}")
         if not pub:
             continue
         meduza_url_pub_map.update({pub["url"]: pub})

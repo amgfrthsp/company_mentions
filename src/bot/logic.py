@@ -1,8 +1,8 @@
 from itertools import groupby
 from operator import attrgetter
 
-from database import functions, tables
-from models import SentimentTypes, CompanyNotifications, NotificationContent, MentionTypes
+from src.database import functions, tables
+from src.models import SentimentTypes, CompanyNotifications, NotificationContent, MentionTypes
 
 
 async def initialize_database():

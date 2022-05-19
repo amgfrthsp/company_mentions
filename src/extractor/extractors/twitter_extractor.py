@@ -34,7 +34,7 @@ def bearer_oauth(r):
 
 def connect_to_endpoint(url):
     response = requests.request("GET", url, auth=bearer_oauth)
-    logging.info(response.status_code)
+    #logging.info(response.status_code)
     if response.status_code != 200:
         raise Exception(f'Request returned an error: {response.status_code} {response.text}')
     return response.json()

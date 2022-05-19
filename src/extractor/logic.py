@@ -17,14 +17,16 @@ async def initialize_database():
 
 
 async def create_mentions(session: AsyncSession, company: tables.Company, mentions: list[Mention]):
+    new_mentions_cnt = 0
     for mention in mentions:
-        await functions.create_mention(session,
-                                       company_id=company.id,
-                                       title=mention.title,
-                                       content=mention.content,
-                                       url=mention.url,
-                                       timestamp=mention.timestamp,
-                                       type=mention.type)
+        new_mentions_cnt += (await functions.create_mention(session,
+                                                            company_id=company.id,
+                                                            title=mention.title,
+                                                            content=mention.content,
+                                                            url=mention.url,
+                                                            timestamp=mention.timestamp,
+                                                            type=mention.type))
+    logging.info(f"{new_mentions_cnt} new mentions of {company.name} added to database")
 
 
 async def extract_last_mentions(extractor):

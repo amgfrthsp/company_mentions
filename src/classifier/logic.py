@@ -28,7 +28,6 @@ async def classify_all():
 
         for mention_db in unclassified_mentions_db:
             await classify(mention_db)
-            logging.info(f"{mention_db.id} is classified")
 
         logging.info(f"{len(unclassified_mentions_db)} mentions is classified")
         await session.commit()

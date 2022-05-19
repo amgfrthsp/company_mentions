@@ -1,7 +1,6 @@
 import translators as ts
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-# from models import ClassifiedMention
 from models import Verdict
 
 analyzer = SentimentIntensityAnalyzer()

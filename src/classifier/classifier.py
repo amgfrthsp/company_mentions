@@ -13,7 +13,9 @@ logging.basicConfig(
 async def async_main():
     await logic.initialize_database()
 
+    logging.info("started classifying...")
     await logic.classify_all()
+    logging.info("finished classifying...")
 
 
 def main():

@@ -118,8 +118,7 @@ async def create_mention(session: AsyncSession,
     stmt = select(Mention).where(Mention.url == url)
     mention = (await session.scalars(stmt)).one_or_none()
     if mention:
-        logging.info(f"Mention {url} already exists")
-        return
+        raise Exception(f"Mention already exists")
 
     new_mention = Mention(
         company_id=company_id,
@@ -131,7 +130,6 @@ async def create_mention(session: AsyncSession,
         is_sent=False
     )
     session.add(new_mention)
-    logging.info(f"Mention of {company_id} added to mentions database")
 
 
 async def get_all_unsent_mentions_sorted_by_company(session: AsyncSession) -> list[Mention]:

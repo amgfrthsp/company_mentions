@@ -5,11 +5,20 @@ import re
 
 from models import Mention, MentionTypes
 
+NAME = "meduza"
 
-def get_raw_pubs(company_name, maxSize=5):
+
+def get_raw_pubs(company_name, maxSize=10000):
     meduza_url_pub_map = {}
     pubs = meduza.search(company_name)
-    for pub in pubs:
+    while True:
+        pub = None
+        try:
+            pub = next(pubs)
+        except StopIteration:
+            break
+        except Exception as e:
+            logging.warning(f"unexpected exception from meduza extractor: {e}")
         if not pub:
             continue
         meduza_url_pub_map.update({pub["url"]: pub})
@@ -79,7 +88,13 @@ def get_last_mentions(company_name) -> list[Mention]:
     pubs = get_raw_pubs(company_name)
     mentions = []
     for pub in pubs:
-        content = get_pub_content(pub)
+        content = ""
+        try:
+            content = get_pub_content(pub)
+        except Exception:
+            logging.warning("unexpected exception while getting meduza content")
+        if content == "":
+            continue
         content = re.sub("<.*?>", "", content)
         mentions.append(Mention(company_name=company_name,
                                 url="meduza.io/" + pub["url"],

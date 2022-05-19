@@ -2,7 +2,7 @@ import logging
 
 import models
 from database import functions, tables
-from classifiers import dostoevsky_classifier, vader_classifier
+from classifier.classifiers import vader_classifier, dostoevsky_classifier
 
 
 async def initialize_database():

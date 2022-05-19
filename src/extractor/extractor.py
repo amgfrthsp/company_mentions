@@ -1,11 +1,11 @@
 """
-Extractor find mentions of companies and brands in differents media and store them in database.
+Extractor find mentions of companies and brands in different media and store them in database.
 """
 
 import asyncio
 import logging
 
-from extractors import meduza_extractor, twitter_extractor
+from extractor.extractors import meduza_extractor, twitter_extractor
 import logic
 
 # define logging format

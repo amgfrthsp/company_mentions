@@ -11,12 +11,12 @@ async def initialize_database():
 async def create_mentions(session: AsyncSession, company: tables.Company, mentions: list[Mention]):
     for mention in mentions:
         await functions.create_mention(session,
-                                company_id=company.id,
-                                title=mention.title,
-                                content=mention.content,
-                                url=mention.url,
-                                timestamp=mention.timestamp,
-                                type=mention.type)
+                                       company_id=company.id,
+                                       title=mention.title,
+                                       content=mention.content,
+                                       url=mention.url,
+                                       timestamp=mention.timestamp,
+                                       type=mention.type)
 
 
 async def extract_last_mentions(extractor):

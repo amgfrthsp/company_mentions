@@ -24,14 +24,6 @@ class Mention:
     title: str = ""
 
 
-# @dataclass
-# class ClassifiedMention:
-#     url: str
-#     positive: float
-#     neutral: float
-#     negative: float
-
-
 @dataclass
 class Verdict:
     positive: float

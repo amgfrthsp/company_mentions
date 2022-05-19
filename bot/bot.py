@@ -1,15 +1,15 @@
 """
-Telegram-bot analyzes mentions of companies and brands in media.
+Telegram-bot sent notifications with analyzed mentions of companies and brands.
 """
-import datetime
 
-from decouple import config
 import asyncio
+import datetime
 import logging
-import logic
+from decouple import config
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler
 
+import logic
 from models import SentimentTypes
 
 TOKEN = config('TELEGRAM_BOT_TOKEN')

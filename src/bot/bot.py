@@ -10,7 +10,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler
 
 import logic
-from src.models import SentimentTypes
+from models import SentimentTypes
 
 TOKEN = config('TELEGRAM_BOT_TOKEN')
 MAX_NEWS_LENGTH = 2000

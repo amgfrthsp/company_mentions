@@ -2,8 +2,8 @@ import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import functions, tables
-from src.models import Mention
+from database import functions, tables
+from models import Mention
 
 # define logging format
 logging.basicConfig(

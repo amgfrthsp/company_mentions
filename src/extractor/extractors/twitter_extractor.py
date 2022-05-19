@@ -2,7 +2,7 @@ import logging
 import json
 import requests
 from decouple import config
-from src.models import Mention, MentionTypes
+from models import Mention, MentionTypes
 
 
 def create_url(query: str) -> str:

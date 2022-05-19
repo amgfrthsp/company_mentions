@@ -2,7 +2,7 @@ from sqlalchemy import Table, UniqueConstraint, Column, ForeignKey, Integer, Str
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-from src import models
+import models
 
 Base = declarative_base()
 

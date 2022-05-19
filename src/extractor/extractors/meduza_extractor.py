@@ -3,7 +3,7 @@ import logging
 import meduza
 import re
 
-from src.models import Mention, MentionTypes
+from models import Mention, MentionTypes
 
 
 def get_raw_pubs(company_name, maxSize=10000):
@@ -86,7 +86,13 @@ def get_last_mentions(company_name) -> list[Mention]:
     pubs = get_raw_pubs(company_name)
     mentions = []
     for pub in pubs:
-        content = get_pub_content(pub)
+        content = ""
+        try:
+            content = get_pub_content(pub)
+        except Exception:
+            logging.warning("unexpected exception while getting meduza content")
+        if content == "":
+            continue
         content = re.sub("<.*?>", "", content)
         mentions.append(Mention(company_name=company_name,
                                 url="meduza.io/" + pub["url"],

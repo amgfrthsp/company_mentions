@@ -4,13 +4,14 @@ Extractor find mentions of companies and brands in different media and store the
 
 import asyncio
 import logging
+import os
 
 from extractors import meduza_extractor, twitter_extractor
 import logic
 
 # define logging format
 logging.basicConfig(
-    filename="extractor.log",
+    filename="../../logs/extractor.log",
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
@@ -37,4 +38,6 @@ def main():
 
 
 if __name__ == '__main__':
+    working_directory = os.path.join(os.getcwd(), os.pardir, os.pardir)
+    os.chdir(working_directory)
     main()

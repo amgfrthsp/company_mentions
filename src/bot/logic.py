@@ -1,39 +1,39 @@
 from itertools import groupby
 from operator import attrgetter
 
-from database import functions, tables
+from database import utils, tables
 from models import SentimentTypes, CompanyNotifications, NotificationContent, MentionTypes
 
 
 async def initialize_database():
-    await functions.initialize()
+    await utils.initialize()
 
 
 async def start_bot(telegram_user_id: int):
-    async with functions.Session() as session:
-        await functions.get_or_create_user(session, telegram_user_id)
+    async with utils.Session() as session:
+        await utils.get_or_create_user(session, telegram_user_id)
         await session.commit()
 
 
 async def subscribe(telegram_user_id: int, company_name: str):
-    async with functions.Session() as session:
-        user = await functions.get_or_create_user(session, telegram_user_id)
-        company = await functions.get_or_create_company(session, company_name)
-        await functions.create_subscription(user, company)
+    async with utils.Session() as session:
+        user = await utils.get_or_create_user(session, telegram_user_id)
+        company = await utils.get_or_create_company(session, company_name)
+        await utils.create_subscription(user, company)
         await session.commit()
 
 
 async def unsubscribe(telegram_user_id: int, company_name: str):
-    async with functions.Session() as session:
-        user = await functions.get_or_create_user(session, telegram_user_id)
-        company = await functions.get_or_create_company(session, company_name)
-        await functions.delete_subscription(user, company)
+    async with utils.Session() as session:
+        user = await utils.get_or_create_user(session, telegram_user_id)
+        company = await utils.get_or_create_company(session, company_name)
+        await utils.delete_subscription(user, company)
         await session.commit()
 
 
 async def get_subscriptions(telegram_user_id: int) -> list[str]:
-    async with functions.Session() as session:
-        user = await functions.get_or_create_user(session, telegram_user_id)
+    async with utils.Session() as session:
+        user = await utils.get_or_create_user(session, telegram_user_id)
         subscriptions = [company.name for company in user.companies]
         await session.commit()
     return subscriptions
@@ -73,8 +73,8 @@ async def get_company_notification(company: tables.Company, company_mentions: li
 
 
 async def get_notifications() -> list[CompanyNotifications]:
-    async with functions.Session() as session:
-        mentions = await functions.get_all_unsent_mentions_sorted_by_company(session)
+    async with utils.Session() as session:
+        mentions = await utils.get_all_unsent_mentions_sorted_by_company(session)
 
         notifications = []
         for company, company_mentions in groupby(mentions, attrgetter('company')):

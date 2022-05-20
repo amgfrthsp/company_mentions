@@ -1,3 +1,4 @@
+import os
 import asyncio
 import logging
 
@@ -5,6 +6,7 @@ import logic
 
 # define logging format
 logging.basicConfig(
+    filename="../../logs/extractor.log",
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
@@ -24,4 +26,6 @@ def main():
 
 
 if __name__ == '__main__':
+    working_directory = os.path.join(os.getcwd(), os.pardir, os.pardir)
+    os.chdir(working_directory)
     main()

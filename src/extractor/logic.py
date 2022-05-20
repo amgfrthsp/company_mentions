@@ -7,6 +7,8 @@ from models import Mention
 
 # define logging format
 logging.basicConfig(
+    filename="extractor.log",
+    filemode='a',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )

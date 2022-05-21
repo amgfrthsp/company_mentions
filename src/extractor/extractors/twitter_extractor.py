@@ -1,6 +1,7 @@
+import calendar
 import logging
 import datetime
-import time
+
 import requests
 from decouple import config
 from models import Mention, MentionTypes
@@ -47,7 +48,9 @@ def connect_to_endpoint(url):
 
 def add_mentions_from_tweets(company_name: str, mentions: list[Mention], tweets: list[dict], type: MentionTypes):
     for tweet in tweets:
-        timestamp = time.mktime(datetime.datetime.strptime(tweet["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ").timetuple())
+        timestamp = calendar.timegm(
+            datetime.datetime.strptime(tweet["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ").timetuple()
+        )
         mentions.append(Mention(
             company_name=company_name,
             content=tweet["text"],

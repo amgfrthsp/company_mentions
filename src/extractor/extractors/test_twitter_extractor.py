@@ -86,14 +86,14 @@ class TwitterExtractorCase(unittest.TestCase):
                 company_name=company_name,
                 content="MMM is good",
                 url=f'https://twitter.com/anyuser/status/228',
-                timestamp=1652872089,
+                timestamp=1652879289,
                 type=MentionTypes.NEWS
             ),
             Mention(
                 company_name=company_name,
                 content="MMM is bad",
                 url=f'https://twitter.com/anyuser/status/239',
-                timestamp=1652699289,
+                timestamp=1652706489,
                 type=MentionTypes.NEWS
             )
         ]
@@ -122,14 +122,14 @@ class TwitterExtractorCase(unittest.TestCase):
                 company_name=company_name,
                 content="Fancy https://twitter.com/SofiaLadyPython/status/1455871145954226179",
                 url=f'https://twitter.com/anyuser/status/1526912526134300672',
-                timestamp=1652872089,
+                timestamp=1652879289,
                 type=MentionTypes.NEWS
             ),
             Mention(
                 company_name=company_name,
                 content="😉 fancy https://twitter.com/SofiaLadyPython/status/1472687542172540928",
                 url=f'https://twitter.com/anyuser/status/1526876616605171712',
-                timestamp=1652863528,
+                timestamp=1652870728,
                 type=MentionTypes.NEWS
             )
         ]

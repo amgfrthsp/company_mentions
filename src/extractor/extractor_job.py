@@ -13,7 +13,7 @@ import asyncio
 import logging
 import os
 
-from extractor.extractors import meduza_extractor, twitter_extractor
+from extractor.extractors import meduza_extractor, twitter_extractor, panorama_extractor
 import extractor.logic as logic
 
 LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
@@ -31,7 +31,7 @@ async def async_main():
     await logic.initialize_database()
 
     logging.info("started extracting mentions...")
-    extractors = [twitter_extractor, meduza_extractor]
+    extractors = [twitter_extractor, meduza_extractor, panorama_extractor]
     for extractor in extractors:
         logging.info(f"started monitoring {extractor.NAME}...")
         await logic.extract_last_mentions(extractor)

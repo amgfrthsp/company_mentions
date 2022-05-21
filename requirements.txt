@@ -7,3 +7,5 @@ dostoevsky==0.6.0
 vaderSentiment==3.3.2
 meduza==20.7.2
 translators==5.2.1
+requests==2.27.1
+beautifulsoup4==4.11.1

@@ -11,4 +11,3 @@ def is_positive(verdict: Verdict) -> bool:
 
 def is_neutral(verdict: Verdict) -> bool:
     return verdict.neutral and verdict.neutral > 0.8
-

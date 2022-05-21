@@ -1,5 +1,7 @@
 import logging
+import os
 
+from decouple import config
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -7,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 import models
 from database.tables import Base, User, Company, Mention
+DATABASE_PATH = config('DATABASE_PATH', default="../database.db")
 
 engine = None
 Session = sessionmaker(class_=AsyncSession)
@@ -34,7 +37,7 @@ def get_engine():
     Do connection to SQLite database.
     """
     try:
-        engine = create_async_engine('sqlite+aiosqlite:///database.db')
+        engine = create_async_engine('sqlite+aiosqlite:///' + DATABASE_PATH)
         logging.info("Database engine connected")
         return engine
     except Exception as e:

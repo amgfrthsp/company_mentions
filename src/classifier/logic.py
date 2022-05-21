@@ -3,7 +3,7 @@ import os
 
 from decouple import config
 
-from classifiers import vader_classifier, dostoevsky_classifier
+from classifier.classifiers import vader_classifier, dostoevsky_classifier
 import models
 from database import tables, utils
 

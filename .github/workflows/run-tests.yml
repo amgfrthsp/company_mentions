@@ -3,7 +3,7 @@ name: run-tests
 on:
   push:
     paths:
-      - 'src'
+      - 'src/**'
 
 jobs:
   run-tests:

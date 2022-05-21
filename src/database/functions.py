@@ -33,7 +33,7 @@ async def create_tables(engine):
 
 def get_engine():
     """
-    Do connection to SQLite database.
+    Connect to SQLite database.
     """
     try:
         engine = create_async_engine(f'sqlite+aiosqlite:///{DATABASE_PATH}')

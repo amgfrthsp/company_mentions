@@ -1,12 +1,22 @@
 import logging
+import os
 
+from decouple import config
+
+from classifiers import vader_classifier, dostoevsky_classifier
 import models
-from classifier.classifiers import vader_classifier, dostoevsky_classifier
-from database import tables, functions
+from database import tables, utils
+
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
+logging.basicConfig(
+    filename=os.path.join(LOGS_PATH, "classifier.log"),
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
 
 async def initialize_database():
-    await functions.initialize()
+    await utils.initialize()
 
 
 async def classify(mention: tables.Mention):
@@ -22,8 +32,8 @@ async def classify(mention: tables.Mention):
 
 
 async def classify_all():
-    async with functions.Session() as session:
-        unclassified_mentions_db = await functions.get_unclassified_mentions(session)
+    async with utils.Session() as session:
+        unclassified_mentions_db = await utils.get_unclassified_mentions(session)
 
         for mention_db in unclassified_mentions_db:
             await classify(mention_db)

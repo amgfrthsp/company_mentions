@@ -5,6 +5,8 @@ Telegram-bot sent notifications with analyzed mentions of companies and brands.
 import asyncio
 import datetime
 import logging
+import os
+
 from decouple import config
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler
@@ -15,8 +17,9 @@ from models import SentimentTypes
 TOKEN = config('TELEGRAM_BOT_TOKEN')
 MAX_NEWS_LENGTH = 2000
 
-# define logging format
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
 logging.basicConfig(
+    filename=os.path.join(LOGS_PATH, "bot.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )

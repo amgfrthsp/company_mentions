@@ -2,14 +2,23 @@
 Extractor find mentions of companies and brands in different media and store them in database.
 """
 
+import sys
+
+from decouple import config
+
+sys.path.append("..")
+
+
 import asyncio
 import logging
+import os
 
 from extractor.extractors import meduza_extractor, twitter_extractor
 import extractor.logic as logic
 
-# define logging format
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
 logging.basicConfig(
+    filename=os.path.join(LOGS_PATH, "extractor.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
@@ -36,4 +45,6 @@ def main():
 
 
 if __name__ == '__main__':
+    working_directory = os.path.join(os.getcwd(), os.pardir, os.pardir)
+    os.chdir(working_directory)
     main()

@@ -1,26 +1,29 @@
 import logging
+import os
 
+from decouple import config
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import functions, tables
+from database import utils, tables
 from models import Mention
 
-# define logging format
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
 logging.basicConfig(
+    filename=os.path.join(LOGS_PATH, "extractor.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
 
 async def initialize_database():
-    await functions.initialize()
+    await utils.initialize()
 
 
 async def create_mentions(session: AsyncSession, company: tables.Company, mentions: list[Mention]):
     new_mentions_cnt = 0
     for mention in mentions:
         try:
-            await functions.create_mention(session,
+            await utils.create_mention(session,
                                            company_id=company.id,
                                            title=mention.title,
                                            content=mention.content,
@@ -35,8 +38,8 @@ async def create_mentions(session: AsyncSession, company: tables.Company, mentio
 
 
 async def extract_last_mentions(extractor):
-    async with functions.Session() as session:
-        companies = await functions.get_all_companies(session)
+    async with utils.Session() as session:
+        companies = await utils.get_all_companies(session)
         for company in companies:
             mentions = extractor.get_last_mentions(company.name)
             await create_mentions(session, company, mentions)

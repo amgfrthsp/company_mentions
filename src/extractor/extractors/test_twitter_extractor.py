@@ -2,7 +2,7 @@ import unittest
 from unittest import mock
 
 from models import MentionTypes, Mention
-from twitter_extractor import create_url, create_news_url, create_posts_url, add_mentions_from_tweets, \
+from extractor.extractors.twitter_extractor import create_url, create_news_url, create_posts_url, add_mentions_from_tweets, \
     get_last_mentions, connect_to_endpoint
 
 FANCY_NEWS_URL = 'https://api.twitter.com/2/tweets/search/recent?query=("fancy" (lang:en OR lang:ru) is:verified ' \

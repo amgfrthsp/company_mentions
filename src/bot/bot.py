@@ -17,7 +17,7 @@ MAX_NEWS_LENGTH = 2000
 
 # define logging format
 logging.basicConfig(
-    filename="../../logs/extractor.log",
+    filename="../../logs/bot.log",
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )

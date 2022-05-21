@@ -2,6 +2,11 @@
 Extractor find mentions of companies and brands in different media and store them in database.
 """
 
+import sys
+
+sys.path.append("..")
+
+
 import asyncio
 import logging
 import os
@@ -11,7 +16,7 @@ import logic
 
 # define logging format
 logging.basicConfig(
-    filename="../../logs/extractor.log",
+    filename="/home/amgfrthsp/company_mentions/logs/extractor.log",
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )

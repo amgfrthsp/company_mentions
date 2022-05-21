@@ -85,7 +85,6 @@ class Mention(Base):
 
     verdict = relationship(
         "Verdict",
-        # back_populates="base_mention",
         lazy="selectin",
         uselist=False)
 

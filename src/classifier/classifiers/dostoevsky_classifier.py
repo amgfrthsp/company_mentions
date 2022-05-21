@@ -1,8 +1,12 @@
+import os
+
 from dostoevsky.tokenization import RegexTokenizer
 from dostoevsky.models import FastTextSocialNetworkModel
 
 from models import Verdict
 
+FastTextSocialNetworkModel.MODEL_PATH = os.path.join('classifier', 'classifiers', 'model',
+                                                     'fasttext-social-network-model.bin')
 tokenizer = RegexTokenizer()
 model = FastTextSocialNetworkModel(tokenizer=tokenizer)
 

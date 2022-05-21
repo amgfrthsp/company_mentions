@@ -1,13 +1,15 @@
 import logging
+import os
 
+from decouple import config
 
 from classifiers import vader_classifier, dostoevsky_classifier
 import models
 from database import tables, utils
 
-# define logging format
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
 logging.basicConfig(
-    filename="../../logs/extractor.log",
+    filename=os.path.join(LOGS_PATH, "classifier.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )

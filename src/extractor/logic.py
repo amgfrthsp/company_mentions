@@ -1,13 +1,15 @@
 import logging
+import os
 
+from decouple import config
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import utils, tables
 from models import Mention
 
-# define logging format
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
 logging.basicConfig(
-    filename="../../logs/classifier.log",
+    filename=os.path.join(LOGS_PATH, "extractor.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )

@@ -5,12 +5,14 @@ sys.path.append("..")
 import os
 import asyncio
 import logging
+from decouple import config
 
 import logic
 
 # define logging format
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
 logging.basicConfig(
-    filename="../../logs/classifier.log",
+    filename=os.path.join(LOGS_PATH, "classifier.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )

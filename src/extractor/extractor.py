@@ -4,6 +4,8 @@ Extractor find mentions of companies and brands in different media and store the
 
 import sys
 
+from decouple import config
+
 sys.path.append("..")
 
 
@@ -14,9 +16,9 @@ import os
 from extractors import meduza_extractor, twitter_extractor
 import logic
 
-# define logging format
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
 logging.basicConfig(
-    filename="/home/amgfrthsp/company_mentions/logs/extractor.log",
+    filename=os.path.join(LOGS_PATH, "extractor.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )

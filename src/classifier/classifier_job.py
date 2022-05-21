@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-import logic
+import classifier.logic as logic
 
 # define logging format
 logging.basicConfig(

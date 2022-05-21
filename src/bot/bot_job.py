@@ -9,7 +9,7 @@ from decouple import config
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler
 
-import logic
+import bot.logic as logic
 from models import SentimentTypes
 
 TOKEN = config('TELEGRAM_BOT_TOKEN')

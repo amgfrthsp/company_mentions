@@ -1,8 +1,7 @@
 import logging
 
-
-from classifiers import vader_classifier, dostoevsky_classifier
 import models
+from classifier.classifiers import vader_classifier, dostoevsky_classifier
 from database import tables, functions
 
 

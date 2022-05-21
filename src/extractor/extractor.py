@@ -5,7 +5,7 @@ Extractor find mentions of companies and brands in different media and store the
 import asyncio
 import logging
 
-from extractors import meduza_extractor, twitter_extractor
+from .extractors import meduza_extractor, twitter_extractor
 import logic
 
 # define logging format

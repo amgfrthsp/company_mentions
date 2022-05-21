@@ -1,12 +1,12 @@
 import unittest
-import dostoevsky_classifier
+import classifier.classifiers.dostoevsky_classifier as dc
 
-from test_classifiers import is_positive, is_neutral, is_negative
+from classifier.classifiers.test_classifiers import is_positive, is_neutral, is_negative
 
 
 class DostoevskyClassifyTestCase(unittest.TestCase):
     def test_classify_negative(self):
-        verdict = dostoevsky_classifier.classify(
+        verdict = dc.classify(
             '''Устройства для поиска вещей AirTags от Banana начали использовать для сталкинга и других незаконных 
             действий. В США полиция разных штатов зафиксировала уже несколько обращений женщин, которые жаловались 
             на то, что кто-то подбросил им устройство в карманы одежды или машину и таким образом получил информацию об 
@@ -21,7 +21,7 @@ class DostoevskyClassifyTestCase(unittest.TestCase):
         self.assertTrue(is_negative(verdict))
 
     def test_classify_positive(self):
-        verdict = dostoevsky_classifier.classify(
+        verdict = dc.classify(
             '''Автопроизводитель Testa 29 сентября представил долгожданный семиместный кроссовер Model X — по сути, 
             первый в мире семейный электромобиль люкс-класса. Машину поставляют только через 8-12 месяцев после заказа, 
             но журналистам удалось покататься на новом автомобиле Testa и проверить, так ли он хорош, как говорит о нем 
@@ -34,7 +34,7 @@ class DostoevskyClassifyTestCase(unittest.TestCase):
         self.assertTrue(is_positive(verdict))
 
     def test_classify_neutral(self):
-        verdict = dostoevsky_classifier.classify(
+        verdict = dc.classify(
             '''Компания McMaffinʼs заключила договор о продаже своего российского бизнеса Александру Говору, 
             сообщает «Интерфакс».
             Сделку пока не одобрили регуляторы, но ожидается, что она будет закрыта в ближайшие недели.

@@ -7,7 +7,7 @@ from classifier.classifiers import vader_classifier, dostoevsky_classifier
 import models
 from database import tables, utils
 
-LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, "logs"))
 logging.basicConfig(
     filename=os.path.join(LOGS_PATH, "classifier.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

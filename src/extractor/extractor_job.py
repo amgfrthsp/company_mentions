@@ -6,7 +6,7 @@ import sys
 
 from decouple import config
 
-sys.path.append("..")
+sys.path.append(".")
 
 
 import asyncio
@@ -16,7 +16,7 @@ import os
 from extractor.extractors import meduza_extractor, twitter_extractor, panorama_extractor
 import extractor.logic as logic
 
-LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, "logs"))
 logging.basicConfig(
     filename=os.path.join(LOGS_PATH, "extractor.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -45,6 +45,4 @@ def main():
 
 
 if __name__ == '__main__':
-    working_directory = os.path.join(os.getcwd(), os.pardir, os.pardir)
-    os.chdir(working_directory)
     main()

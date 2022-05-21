@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 import models
 from database.tables import Base, User, Company, Mention
-DATABASE_PATH = config('DATABASE_PATH', default="database.db")
+DATABASE_PATH = config('DATABASE_PATH', default="../database.db")
 
 engine = None
 Session = sessionmaker(class_=AsyncSession)

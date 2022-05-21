@@ -17,7 +17,7 @@ from models import SentimentTypes
 TOKEN = config('TELEGRAM_BOT_TOKEN')
 MAX_NEWS_LENGTH = 2000
 
-LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, "logs"))
 logging.basicConfig(
     filename=os.path.join(LOGS_PATH, "bot.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

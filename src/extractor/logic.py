@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import utils, tables
 from models import Mention
 
-LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, "logs"))
 logging.basicConfig(
     filename=os.path.join(LOGS_PATH, "extractor.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

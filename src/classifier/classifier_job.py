@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("..")
+sys.path.append(".")
 
 import os
 import asyncio
@@ -10,7 +10,7 @@ from decouple import config
 import classifier.logic as logic
 
 # define logging format
-LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, os.pardir, "logs"))
+LOGS_PATH = config('LOGS_PATH', default=os.path.join(os.pardir, "logs"))
 logging.basicConfig(
     filename=os.path.join(LOGS_PATH, "classifier.log"),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -32,6 +32,4 @@ def main():
 
 
 if __name__ == '__main__':
-    working_directory = os.path.join(os.getcwd(), os.pardir, os.pardir)
-    os.chdir(working_directory)
     main()

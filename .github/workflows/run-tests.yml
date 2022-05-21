@@ -1,0 +1,28 @@
+name: run-tests
+
+on:
+  push:
+    paths:
+      - 'src'
+
+jobs:
+  compile-cv:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+
+      - name: Install requirements
+        uses: BSFishy/pip-action@v1
+        with:
+          requirements: requirements.txt
+
+      - name: Test with unittest
+        run: |
+          cd src
+          python -m unittest discover

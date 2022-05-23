@@ -4,3 +4,4 @@ database.db
 *.log
 !.gitignore
 !.github
+!logs

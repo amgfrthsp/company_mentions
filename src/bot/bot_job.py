@@ -113,7 +113,6 @@ async def get_sentiment_smile(sentiment: SentimentTypes) -> str:
 
 async def get_news_text(news):
     max_news_length = MAX_NEWS_LENGTH // len(news)
-    print(max_news_length)
     news_texts = []
     for new in news:
         title_text = f"*{new.title.strip()}*\n" if new.title else ""
@@ -180,7 +179,7 @@ async def get_last_news(update: Update, context: CallbackContext.DEFAULT_TYPE):
         last_notifications = (await logic.get_last_notifications_for_company(company_name))
     except Exception as e:
         logging.exception(e)
-        await update.message.reply_text(f"👀 Ничего не нашлось про #{company_name} :(")
+        await update.message.reply_text(f"👀 Ничего не нашлось про #{company_name}")
         return
 
     text = (await construct_text_for_notification_message(last_notifications))

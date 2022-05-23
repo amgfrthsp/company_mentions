@@ -1,4 +1,5 @@
 import logging
+import os
 
 from decouple import config
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -8,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 import models
 from database.tables import Base, User, Company, Mention
-DATABASE_PATH = config('DATABASE_PATH', default="../database.db")
+DATABASE_PATH = config('DATABASE_PATH', default=os.path.join(os.pardir, "database.db"))
 
 engine = None
 Session = sessionmaker(class_=AsyncSession)

@@ -1,17 +1,14 @@
 """
 Extractor find mentions of companies and brands in different media and store them in database.
 """
-
-import sys
-
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from decouple import config
-
-sys.path.append(".")
-
-
+import sys
 import asyncio
 import logging
 import os
+
+sys.path.append(".")
 
 from extractor.extractors import meduza_extractor, twitter_extractor, panorama_extractor
 import extractor.logic as logic
@@ -40,8 +37,15 @@ async def async_main():
 
 
 def main():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(async_main())
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(async_main, 'interval', minutes=20)
+    scheduler.start()
+
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_forever()
+    except (KeyboardInterrupt, SystemExit):
+        pass
 
 
 if __name__ == '__main__':

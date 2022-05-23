@@ -6,10 +6,12 @@ import asyncio
 import datetime
 import logging
 import os
-
+import sys
 from decouple import config
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler
+
+sys.path.append(".")
 
 import bot.logic as logic
 from models import SentimentTypes

@@ -1,6 +1,5 @@
 SQLAlchemy==1.4.36
 aiosqlite==0.17.0
-python-crontab==2.6.0
 python-decouple==3.6
 python-telegram-bot==20.0a0
 dostoevsky==0.6.0

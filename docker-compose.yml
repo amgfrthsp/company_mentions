@@ -1,0 +1,29 @@
+version: '3.4'
+services:
+  bot:
+    image: ladypython/company_mentions:latest
+    build: .
+    environment:
+      - TELEGRAM_BOT_TOKEN
+    volumes:
+      - ./database.db:/database.db
+      - ./logs:/logs
+    command: python bot/bot_job.py
+
+  classifier:
+    image: ladypython/company_mentions:latest
+    build: .
+    volumes:
+      - ./database.db:/database.db
+      - ./logs:/logs
+    command: python classifier/classifier_job.py
+
+  extractor:
+    image: ladypython/company_mentions:latest
+    build: .
+    environment:
+      - TWITTER_BEARER_TOKEN
+    volumes:
+      - ./database.db:/database.db
+      - ./logs:/logs
+    command: python extractor/extractor_job.py

@@ -1,12 +1,6 @@
 name: build-image
 
-on:
-  push:
-    paths:
-      - 'src/**'
-      - 'Dockerfile'
-      - 'requirements.txt'
-
+on: push
 jobs:
   run-tests:
     runs-on: ubuntu-latest

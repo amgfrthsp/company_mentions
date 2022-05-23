@@ -1,4 +1,4 @@
-APScheduler==3.6.3
+APScheduler==3.9.1
 SQLAlchemy==1.4.36
 aiosqlite==0.17.0
 python-decouple==3.6

@@ -13,6 +13,7 @@
 
 [@ms_sentiment_bot](https://t.me/ms_sentiment_bot) — telegram-бот, который не только присылает упоминания компаний или брендов в Meduza, Twitter и Панорама, но и анализирует их контекст 🙂😐🙁.
 
+https://user-images.githubusercontent.com/6313540/169890802-d1e885c2-95da-44cb-b1da-72573c56a182.mp4
 
 ## Запуск
 
@@ -22,3 +23,4 @@
 3. Установить [docker](https://docs.docker.com/get-docker/) и [docker-compose](https://docs.docker.com/compose/install/).
 4. Скачать готовые docker-образы `docker-compose pull`
 5. Запустить `TELEGRAM_BOT_TOKEN="123..." TWITTER_BEARER_TOKEN="AAA..." docker-compose up`
+

@@ -29,6 +29,9 @@ jobs:
           cd src
           python -m unittest discover
 
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -39,4 +42,5 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ladypython/company_mentions:latestt
+          tags: ladypython/company_mentions:latest
+    needs: run-tests

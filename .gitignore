@@ -1,7 +1,5 @@
 .*
 *__pycache__/
 database.db
-*.log
 !.gitignore
 !.github
-!logs

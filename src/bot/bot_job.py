@@ -170,7 +170,7 @@ async def get_last_news(update: Update, context: CallbackContext.DEFAULT_TYPE):
     """
     # args should contain the name of company
     if not context.args:
-        await update.effective_message.reply_text("Чтобы посмотреть последние упоминания, напиши /get_last_news _company_",
+        await update.effective_message.reply_text("Чтобы посмотреть последние упоминания, напиши /get\_last\_news _company_",
                                                   parse_mode="markdown")
         return
 

@@ -81,3 +81,13 @@ async def get_notifications() -> list[CompanyNotifications]:
             notifications.append(await get_company_notification(company, company_mentions))
         await session.commit()
     return notifications
+
+
+async def get_last_notifications_for_company(company_name) -> CompanyNotifications:
+    async with utils.Session() as session:
+        company = await utils.get_or_create_company(session, company_name)
+        mentions = await utils.get_last_mentions_for_company(session, company)
+
+        notifications = (await get_company_notification(company, mentions))
+        await session.commit()
+    return notifications

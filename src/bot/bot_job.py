@@ -116,26 +116,41 @@ async def get_news_text(news):
     print(max_news_length)
     news_texts = []
     for new in news:
-        title_text = f"*{new.title}*\n" if new.title else ""
-        content_text = f"`{new.content[:max_news_length]}`[...]({new.url})\n" \
+        title_text = f"*{new.title.strip()}*\n" if new.title else ""
+        content_text = f"`{new.content[:max_news_length].strip()}`[...]({new.url})\n" \
             if len(new.content) > max_news_length else \
-            f"`{new.content}`\n[источник]({new.url})\n"
+            f"`{new.content}`\n[источник]({new.url})\n\n"
         news_texts.append(f"  {await get_sentiment_smile(new.sentiment)} {title_text}{content_text}")
     return ''.join(news_texts)
 
 
 async def get_posts_text(posts):
     return ''.join([
-        f"  {await get_sentiment_smile(post.sentiment)} _{post.content}_ [источник]({post.url})\n"
+        f"  {await get_sentiment_smile(post.sentiment)} _{post.content}_ [источник]({post.url})\n\n"
         for post in posts]
     )
 
 
 async def get_mems_text(mems):
     return ''.join([
-        f"  {await get_sentiment_smile(mem.sentiment)}\n{mem.content}\n[источник]({mem.url})\n"
+        f"  {await get_sentiment_smile(mem.sentiment)}\n{mem.content}\n[источник]({mem.url})\n\n"
         for mem in mems]
     )
+
+
+async def construct_text_for_notification_message(company_notification):
+    news_text = ""
+    posts_text = ""
+    mems_text = ""
+
+    if company_notification.news:
+        news_text = f"📰 Новости:\n{await get_news_text(company_notification.news)}\n"
+    if company_notification.posts:
+        posts_text = f"💬 Посты:\n{await get_posts_text(company_notification.posts)}\n"
+    if company_notification.mems:
+        mems_text = f"🤣 Мемы:\n{await get_mems_text(company_notification.mems)}\n"
+
+    return f'''#{company_notification.company_name}\n\n{news_text}{posts_text}{mems_text}'''
 
 
 async def send_notifications(context):
@@ -144,21 +159,32 @@ async def send_notifications(context):
     """
     notifications_by_companies = await logic.get_notifications()
     for company_notification in notifications_by_companies:
-        news_text = ""
-        posts_text = ""
-        mems_text = ""
-
-        if company_notification.news:
-            news_text = f"📰 Новости:\n{await get_news_text(company_notification.news)}\n\n"
-        if company_notification.posts:
-            posts_text = f"💬 Посты:\n{await get_posts_text(company_notification.posts)}\n\n"
-        if company_notification.mems:
-            mems_text = f"🤣 Мемы:\n{await get_mems_text(company_notification.mems)}\n\n"
-
-        text = f'''#{company_notification.company_name}\n\n{news_text}{posts_text}{mems_text}'''
-
+        text = (await construct_text_for_notification_message(company_notification))
         for user_id in company_notification.user_ids:
             await context.bot.send_message(chat_id=user_id, text=text, parse_mode="markdown")
+
+
+async def get_last_news(update: Update, context: CallbackContext.DEFAULT_TYPE):
+    """
+    Get last mentions of chosen company.
+    """
+    # args should contain the name of company
+    if not context.args:
+        await update.effective_message.reply_text("Чтобы посмотреть последние упоминания, напиши /get_last_news _company_",
+                                                  parse_mode="markdown")
+        return
+
+    company_name = ' '.join(context.args)
+
+    try:
+        last_notifications = (await logic.get_last_notifications_for_company(company_name))
+    except Exception as e:
+        logging.exception(e)
+        await update.message.reply_text(f"👀 Ничего не нашлось про #{company_name} :(")
+        return
+
+    text = (await construct_text_for_notification_message(last_notifications))
+    await update.message.reply_text(text=text, parse_mode="markdown")
 
 
 async def async_main():
@@ -177,6 +203,7 @@ def main():
     application.add_handler(CommandHandler("subscribe", subscribe))
     application.add_handler(CommandHandler("unsubscribe", unsubscribe))
     application.add_handler(CommandHandler("get_subscriptions", get_subscriptions))
+    application.add_handler(CommandHandler("get_last_news", get_last_news))
     application.run_polling()
 
 

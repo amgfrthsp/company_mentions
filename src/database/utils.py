@@ -3,7 +3,7 @@ import logging
 from decouple import config
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, and_, desc
 from sqlalchemy.orm import sessionmaker
 
 import models
@@ -138,10 +138,24 @@ async def get_all_unsent_mentions_sorted_by_company(session: AsyncSession) -> li
     """
     Return list of unsent mentions ordered by company_id.
     """
-    stmt = select(Mention).where(Mention.is_sent == False).order_by(Mention.company_id)
+    stmt = select(Mention).where(and_(Mention.is_sent == False, Mention.verdict != None)).order_by(Mention.company_id)
     unsent_mentions_db = (await session.scalars(stmt)).all()
     logging.info(f"{len(unsent_mentions_db)} unsent mentions returned")
     return unsent_mentions_db
+
+
+async def get_last_mentions_for_company(session: AsyncSession, company) -> list[Mention]:
+    """
+    Return list of last mentions for company_id.
+    """
+    LAST_MENTIONS_BATCH_SIZE = 5
+    stmt = select(Mention)\
+        .where(and_(Mention.verdict != None, Mention.company_id == company.id))\
+        .order_by(desc(Mention.timestamp))
+    last_mentions_db = (await session.scalars(stmt)).all()
+    last_mentions_db = last_mentions_db[:LAST_MENTIONS_BATCH_SIZE]
+    logging.info(f"{len(last_mentions_db)} last mentions for comapany {company.id} returned")
+    return last_mentions_db
 
 
 async def get_unclassified_mentions(session: AsyncSession) -> list[Mention]:

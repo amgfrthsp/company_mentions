@@ -166,7 +166,7 @@ async def send_notifications(context):
 
 async def get_last_news(update: Update, context: CallbackContext.DEFAULT_TYPE):
     """
-    Unsubscribe user from chosen company.
+    Get last mentions of chosen company.
     """
     # args should contain the name of company
     if not context.args:
